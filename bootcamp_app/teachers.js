@@ -1,8 +1,11 @@
+// import dependencies
 const { Pool } = require("pg");
 
 // import env variables
 require("dotenv").config();
 
+// define internal variables
+const cohortName = process.argv[2];
 const pool = new Pool({
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
@@ -10,8 +13,7 @@ const pool = new Pool({
   database: process.env.DB_NAME,
 });
 
-pool.connect()
-.then(() => console.log("connected"));
+pool.connect().then(() => console.log("connected"));
 
 pool
   .query(
@@ -25,8 +27,8 @@ pool
     ORDER BY teacher
     ; 
     `,
-    [`%${process.argv[2]}%`]
-  ) //user input for cohort name
+    [`%${cohortName}%`]
+  )
   .then((res) => {
     res.rows.forEach((row) => {
       console.log(`${row.cohort}: ${row.teacher}`);
@@ -34,4 +36,4 @@ pool
   })
   .catch((err) => console.error("query error", err.stack));
 
-  pool.end();
+pool.end();
